@@ -1,0 +1,55 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36511.14 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.UI.Avalonia", "AquaEdit.UI.Avalonia\AquaEdit.UI.Avalonia.csproj", "{CA2DC050-7FB7-BAC1-1C60-2BCFB480735B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.UI.Avalonia.Desktop", "AquaEdit.UI.Avalonia.Desktop\AquaEdit.UI.Avalonia.Desktop.csproj", "{C031AAE0-2272-F60A-7E94-F0CCDE0B28EE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		..\LICENSE = ..\LICENSE
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Core", "AquaEdit.Core\AquaEdit.Core.csproj", "{D0C48BF6-575A-4389-A6DB-B90FAFAB88A0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Plugins", "AquaEdit.Plugins\AquaEdit.Plugins.csproj", "{6A656A64-0E51-45A5-8DCA-1AD527761296}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Tests", "AquaEdit.Tests\AquaEdit.Tests.csproj", "{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA2DC050-7FB7-BAC1-1C60-2BCFB480735B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA2DC050-7FB7-BAC1-1C60-2BCFB480735B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA2DC050-7FB7-BAC1-1C60-2BCFB480735B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA2DC050-7FB7-BAC1-1C60-2BCFB480735B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C031AAE0-2272-F60A-7E94-F0CCDE0B28EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C031AAE0-2272-F60A-7E94-F0CCDE0B28EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C031AAE0-2272-F60A-7E94-F0CCDE0B28EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C031AAE0-2272-F60A-7E94-F0CCDE0B28EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0C48BF6-575A-4389-A6DB-B90FAFAB88A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0C48BF6-575A-4389-A6DB-B90FAFAB88A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0C48BF6-575A-4389-A6DB-B90FAFAB88A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0C48BF6-575A-4389-A6DB-B90FAFAB88A0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B06EDD92-62B7-4D2A-B8C4-13D800FF855E}
+	EndGlobalSection
+EndGlobal
