@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AquaEdit.UI.Avalonia.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="200"
+        x:Class="AquaEdit.UI.Avalonia.Views.Dialogs.GoToLineDialog"
+        x:DataType="vm:GoToLineViewModel"
+        Title="Go To Line"
+        Width="400" Height="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+  <Design.DataContext>
+    <vm:GoToLineViewModel />
+  </Design.DataContext>
+
+  <DockPanel Margin="16">
+    <!-- Button Bar -->
+    <StackPanel DockPanel.Dock="Bottom" 
+                Orientation="Horizontal" 
+                HorizontalAlignment="Right"
+                Spacing="8"
+                Margin="0,16,0,0">
+      <Button Content="Go To"
+              Command="{Binding GoToCommand}"
+              MinWidth="80"
+              Classes="accent" />
+      <Button Content="Cancel"
+              Command="{Binding CancelCommand}"
+              MinWidth="80" />
+    </StackPanel>
+
+    <!-- Content -->
+    <StackPanel Spacing="16">
+      <!-- Prompt -->
+      <TextBlock Text="{Binding PromptText}"
+                 FontSize="14" />
+
+      <!-- Input -->
+      <NumericUpDown Value="{Binding LineNumber}"
+                     Minimum="1"
+                     Maximum="{Binding MaxLineNumber}"
+                     Increment="1"
+                     HorizontalAlignment="Stretch"
+                     Watermark="Line number" />
+
+      <!-- Error Message -->
+      <TextBlock Text="{Binding ErrorMessage}"
+                 IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                 Foreground="Red"
+                 FontSize="12"
+                 TextWrapping="Wrap" />
+
+      <!-- Info -->
+      <TextBlock FontSize="12"
+                 Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+        <Run Text="Tip: You can also use Ctrl+G keyboard shortcut" />
+      </TextBlock>
+    </StackPanel>
+  </DockPanel>
+</Window>

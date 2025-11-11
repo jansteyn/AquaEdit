@@ -1,0 +1,92 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AquaEdit.UI.Avalonia.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="AquaEdit.UI.Avalonia.Views.EditorView"
+             x:DataType="vm:EditorViewModel">
+  
+  <Design.DataContext>
+    <vm:EditorViewModel />
+  </Design.DataContext>
+
+  <Grid>
+    <!-- Line Number Column -->
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- Line Numbers -->
+    <Border Grid.Column="0"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="0,0,1,0"
+            Padding="8,4">
+      <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                    HorizontalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding VisibleLines}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <TextBlock Text="{Binding}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         FontSize="14"
+                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                         TextAlignment="Right"
+                         Padding="4,2" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Editor Content -->
+    <Border Grid.Column="1"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+      <ScrollViewer Name="EditorScroller"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Visible">
+        <TextBox Text="{Binding VisibleLines}"
+                 FontFamily="Consolas,Courier New,monospace"
+                 FontSize="14"
+                 AcceptsReturn="True"
+                 TextWrapping="NoWrap"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Padding="8,4"
+                 MinHeight="600">
+          <TextBox.Styles>
+            <Style Selector="TextBox">
+              <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            </Style>
+          </TextBox.Styles>
+        </TextBox>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Virtualized List (Alternative implementation for large files) -->
+    <!--
+    <ListBox Grid.Column="1"
+             ItemsSource="{Binding VisibleLines}"
+             SelectionMode="Single"
+             Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+             BorderThickness="0">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <TextBlock Text="{Binding}"
+                     FontFamily="Consolas,Courier New,monospace"
+                     FontSize="14"
+                     Padding="8,2" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+      <ListBox.Styles>
+        <Style Selector="ListBoxItem">
+          <Setter Property="Padding" Value="0" />
+          <Setter Property="Margin" Value="0" />
+        </Style>
+      </ListBox.Styles>
+    </ListBox>
+    -->
+  </Grid>
+</UserControl>

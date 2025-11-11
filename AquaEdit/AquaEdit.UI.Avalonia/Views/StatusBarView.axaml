@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:AquaEdit.UI.Avalonia.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="30"
+             x:Class="AquaEdit.UI.Avalonia.Views.StatusBarView"
+             x:DataType="vm:StatusBarViewModel">
+  
+  <Design.DataContext>
+    <vm:StatusBarViewModel />
+  </Design.DataContext>
+
+  <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+    <!-- Status Message -->
+    <TextBlock Grid.Column="0"
+               Text="{Binding Message}"
+               VerticalAlignment="Center"
+               Margin="0,0,16,0" />
+
+    <!-- Position Info -->
+    <StackPanel Grid.Column="1" 
+                Orientation="Horizontal" 
+                Spacing="8"
+                Margin="0,0,16,0">
+      <PathIcon Data="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,7H13V9H11V7M11,11H13V17H11V11Z"
+                Width="14" Height="14"
+                VerticalAlignment="Center" />
+      <TextBlock Text="{Binding Position}"
+                 VerticalAlignment="Center"
+                 FontFamily="Consolas,Courier New,monospace" />
+    </StackPanel>
+
+    <!-- File Size / Line Count -->
+    <TextBlock Grid.Column="2"
+               Text="{Binding FileSize}"
+               VerticalAlignment="Center"
+               Margin="0,0,16,0"
+               FontFamily="Consolas,Courier New,monospace" />
+
+    <!-- Encoding -->
+    <Button Grid.Column="3"
+            Content="{Binding Encoding}"
+            Background="Transparent"
+            BorderThickness="0"
+            Padding="8,4"
+            Margin="0,0,8,0"
+            ToolTip.Tip="Change Encoding"
+            VerticalAlignment="Center">
+      <Button.Styles>
+        <Style Selector="Button:pointerover">
+          <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        </Style>
+      </Button.Styles>
+    </Button>
+
+    <!-- Line Ending -->
+    <Button Grid.Column="4"
+            Content="{Binding LineEnding}"
+            Background="Transparent"
+            BorderThickness="0"
+            Padding="8,4"
+            ToolTip.Tip="Change Line Ending"
+            VerticalAlignment="Center">
+      <Button.Styles>
+        <Style Selector="Button:pointerover">
+          <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+        </Style>
+      </Button.Styles>
+    </Button>
+  </Grid>
+</UserControl>

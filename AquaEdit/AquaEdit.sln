@@ -9,6 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.UI.Avalonia.Deskto
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
+		docs\architecture.md = docs\architecture.md
 		..\LICENSE = ..\LICENSE
 		..\README.md = ..\README.md
 	EndProjectSection
@@ -17,7 +18,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Core", "AquaEdit.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Plugins", "AquaEdit.Plugins\AquaEdit.Plugins.csproj", "{6A656A64-0E51-45A5-8DCA-1AD527761296}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Tests", "AquaEdit.Tests\AquaEdit.Tests.csproj", "{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AquaEdit.Tests", "AquaEdit.Tests\AquaEdit.Tests.csproj", "{570F251C-476F-46CD-AC32-7F937DB36565}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +42,10 @@ Global
 		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A656A64-0E51-45A5-8DCA-1AD527761296}.Release|Any CPU.Build.0 = Release|Any CPU
-		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{56669189-E4C3-4BE3-91F4-0FBD5D0821BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{570F251C-476F-46CD-AC32-7F937DB36565}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{570F251C-476F-46CD-AC32-7F937DB36565}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{570F251C-476F-46CD-AC32-7F937DB36565}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{570F251C-476F-46CD-AC32-7F937DB36565}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

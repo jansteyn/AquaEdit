@@ -1,0 +1,228 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AquaEdit.UI.Avalonia.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="500"
+        x:Class="AquaEdit.UI.Avalonia.Views.Dialogs.SettingsDialog"
+        x:DataType="vm:SettingsViewModel"
+        Title="Settings"
+        Width="600" Height="500"
+        MinWidth="500" MinHeight="400"
+        WindowStartupLocation="CenterOwner"
+        CanResize="True">
+
+  <Design.DataContext>
+    <vm:SettingsViewModel />
+  </Design.DataContext>
+
+  <DockPanel>
+    <!-- Button Bar -->
+    <Border DockPanel.Dock="Bottom"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="0,1,0,0"
+            Padding="16">
+      <StackPanel Orientation="Horizontal" 
+                  HorizontalAlignment="Right"
+                  Spacing="8">
+        <Button Content="Reset to Defaults"
+                Command="{Binding ResetToDefaultsCommand}"
+                HorizontalAlignment="Left" />
+        <Button Content="Apply"
+                Command="{Binding ApplyCommand}"
+                MinWidth="80" />
+        <Button Content="OK"
+                Command="{Binding OkCommand}"
+                MinWidth="80"
+                Classes="accent" />
+        <Button Content="Cancel"
+                Command="{Binding CancelCommand}"
+                MinWidth="80" />
+      </StackPanel>
+    </Border>
+
+    <!-- Settings Content -->
+    <ScrollViewer>
+      <StackPanel Margin="16" Spacing="24">
+        
+        <!-- Editor Settings -->
+        <StackPanel Spacing="8">
+          <TextBlock Text="Editor"
+                     FontSize="18"
+                     FontWeight="SemiBold" />
+          
+          <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+            <!-- Font Family -->
+            <TextBlock Grid.Row="0" Grid.Column="0" 
+                       Text="Font Family:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <ComboBox Grid.Row="0" Grid.Column="1"
+                      ItemsSource="{Binding AvailableFonts}"
+                      SelectedItem="{Binding FontFamily}"
+                      HorizontalAlignment="Stretch"
+                      Margin="0,0,0,12" />
+
+            <!-- Font Size -->
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       Text="Font Size:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <NumericUpDown Grid.Row="1" Grid.Column="1"
+                           Value="{Binding FontSize}"
+                           Minimum="8"
+                           Maximum="72"
+                           Increment="1"
+                           HorizontalAlignment="Left"
+                           Width="100"
+                           Margin="0,0,0,12" />
+
+            <!-- Tab Size -->
+            <TextBlock Grid.Row="2" Grid.Column="0"
+                       Text="Tab Size:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <NumericUpDown Grid.Row="2" Grid.Column="1"
+                           Value="{Binding TabSize}"
+                           Minimum="1"
+                           Maximum="16"
+                           Increment="1"
+                           HorizontalAlignment="Left"
+                           Width="100"
+                           Margin="0,0,0,12" />
+
+            <!-- Insert Spaces -->
+            <TextBlock Grid.Row="3" Grid.Column="0"
+                       Text="Insert Spaces:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <CheckBox Grid.Row="3" Grid.Column="1"
+                      IsChecked="{Binding InsertSpaces}"
+                      Content="Use spaces instead of tabs"
+                      Margin="0,0,0,12" />
+
+            <!-- Word Wrap -->
+            <TextBlock Grid.Row="4" Grid.Column="0"
+                       Text="Word Wrap:"
+                       VerticalAlignment="Center" />
+            <CheckBox Grid.Row="4" Grid.Column="1"
+                      IsChecked="{Binding WordWrap}"
+                      Content="Enable word wrapping" />
+          </Grid>
+        </StackPanel>
+
+        <!-- Display Settings -->
+        <StackPanel Spacing="8">
+          <TextBlock Text="Display"
+                     FontSize="18"
+                     FontWeight="SemiBold" />
+          
+          <StackPanel Spacing="8">
+            <CheckBox IsChecked="{Binding ShowLineNumbers}"
+                      Content="Show line numbers" />
+            <CheckBox IsChecked="{Binding ShowWhitespace}"
+                      Content="Show whitespace characters" />
+          </StackPanel>
+
+          <Grid ColumnDefinitions="200,*" RowDefinitions="Auto">
+            <TextBlock Grid.Column="0"
+                       Text="Theme:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,8,0" />
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding AvailableThemes}"
+                      SelectedItem="{Binding Theme}"
+                      HorizontalAlignment="Left"
+                      MinWidth="150" />
+          </Grid>
+        </StackPanel>
+
+        <!-- File Settings -->
+        <StackPanel Spacing="8">
+          <TextBlock Text="Files"
+                     FontSize="18"
+                     FontWeight="SemiBold" />
+          
+          <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto">
+            <!-- Default Encoding -->
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       Text="Default Encoding:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <ComboBox Grid.Row="0" Grid.Column="1"
+                      ItemsSource="{Binding AvailableEncodings}"
+                      SelectedItem="{Binding DefaultEncoding}"
+                      HorizontalAlignment="Left"
+                      MinWidth="150"
+                      Margin="0,0,0,12" />
+
+            <!-- Auto Save -->
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       Text="Auto Save:"
+                       VerticalAlignment="Center" />
+            <StackPanel Grid.Row="1" Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        Spacing="8">
+              <CheckBox IsChecked="{Binding AutoSave}"
+                        Content="Enable auto-save every" />
+              <NumericUpDown Value="{Binding AutoSaveInterval}"
+                             Minimum="1"
+                             Maximum="60"
+                             Increment="1"
+                             Width="80"
+                             IsEnabled="{Binding AutoSave}" />
+              <TextBlock Text="minutes"
+                         VerticalAlignment="Center" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+
+        <!-- Performance Settings -->
+        <StackPanel Spacing="8">
+          <TextBlock Text="Performance"
+                     FontSize="18"
+                     FontWeight="SemiBold" />
+          
+          <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto">
+            <!-- Window Cache Size -->
+            <TextBlock Grid.Row="0" Grid.Column="0"
+                       Text="Window Cache Size:"
+                       VerticalAlignment="Center"
+                       Margin="0,0,0,12" />
+            <StackPanel Grid.Row="0" Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        Spacing="8"
+                        Margin="0,0,0,12">
+              <NumericUpDown Value="{Binding WindowCacheSize}"
+                             Minimum="5"
+                             Maximum="50"
+                             Increment="5"
+                             Width="100" />
+              <TextBlock Text="windows"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            </StackPanel>
+
+            <!-- Window Size -->
+            <TextBlock Grid.Row="1" Grid.Column="0"
+                       Text="Window Size:"
+                       VerticalAlignment="Center" />
+            <StackPanel Grid.Row="1" Grid.Column="1" 
+                        Orientation="Horizontal" 
+                        Spacing="8">
+              <NumericUpDown Value="{Binding WindowSize}"
+                             Minimum="4"
+                             Maximum="64"
+                             Increment="4"
+                             Width="100" />
+              <TextBlock Text="MB"
+                         VerticalAlignment="Center"
+                         Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

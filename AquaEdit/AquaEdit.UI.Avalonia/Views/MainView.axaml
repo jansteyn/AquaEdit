@@ -3,14 +3,131 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:AquaEdit.UI.Avalonia.ViewModels"
+             xmlns:views="clr-namespace:AquaEdit.UI.Avalonia.Views"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AquaEdit.UI.Avalonia.Views.MainView"
-             x:DataType="vm:MainViewModel">
+             x:DataType="vm:MainViewModel"
+             x:Name="MainViewRoot">
+  
   <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainViewModel />
   </Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+  <DockPanel>
+    <!-- Search Panel (collapsible) -->
+    <Border DockPanel.Dock="Top"
+            IsVisible="{Binding IsSearchVisible}"
+            Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="0,0,0,1"
+            Padding="8">
+      <views:SearchView DataContext="{Binding SearchViewModel}" />
+    </Border>
+
+    <!-- Tab Bar for Multiple Documents -->
+    <Border DockPanel.Dock="Top"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+            BorderThickness="0,0,0,1">
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+                    VerticalScrollBarVisibility="Disabled">
+        <ItemsControl ItemsSource="{Binding OpenDocuments}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Command="{Binding $parent[UserControl].((vm:MainViewModel)DataContext).CloseFileCommand}"
+                      Background="Transparent"
+                      BorderThickness="0,0,1,0"
+                      BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                      Padding="12,8">
+                <Button.Styles>
+                  <Style Selector="Button:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
+                  </Style>
+                </Button.Styles>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Text="{Binding FileName}" 
+                             VerticalAlignment="Center" />
+                  <TextBlock Text="●" 
+                             IsVisible="{Binding IsDirty}"
+                             Foreground="Orange"
+                             VerticalAlignment="Center" />
+                  <PathIcon Data="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"
+                            Width="12" Height="12"
+                            VerticalAlignment="Center" />
+                </StackPanel>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Editor View -->
+    <Grid>
+      <!-- Welcome Screen (when no file is open) -->
+      <Border IsVisible="{Binding !ActiveEditor}"
+              Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+        <StackPanel VerticalAlignment="Center" 
+                    HorizontalAlignment="Center"
+                    Spacing="24">
+          <TextBlock Text="AquaEdit" 
+                     FontSize="48"
+                     FontWeight="Light"
+                     HorizontalAlignment="Center" />
+          <TextBlock Text="High-Performance Text Editor for Large Files"
+                     FontSize="16"
+                     Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                     HorizontalAlignment="Center" />
+          
+          <StackPanel Spacing="8" Margin="0,24,0,0">
+            <Button Command="{Binding NewFileCommand}"
+                    HorizontalAlignment="Center"
+                    MinWidth="200">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+                <TextBlock Text="New File" VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+            
+            <Button Command="{Binding OpenFileCommand}"
+                    HorizontalAlignment="Center"
+                    MinWidth="200">
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <PathIcon Data="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
+                <TextBlock Text="Open File..." VerticalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </StackPanel>
+
+          <!-- Recent Files -->
+          <StackPanel Spacing="8" Margin="0,16,0,0"
+                      IsVisible="{Binding RecentFiles.Count}">
+            <TextBlock Text="Recent Files"
+                       FontSize="14"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Center" />
+            <ItemsControl ItemsSource="{Binding RecentFiles}" MaxWidth="400">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Button Content="{Binding}"
+                          HorizontalAlignment="Stretch"
+                          HorizontalContentAlignment="Left"
+                          Background="Transparent"
+                          Padding="8,4" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- Active Editor -->
+      <views:EditorView DataContext="{Binding ActiveEditor}"
+                        IsVisible="{Binding #MainViewRoot.((vm:MainViewModel)DataContext).ActiveEditor, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    </Grid>
+  </DockPanel>
 </UserControl>
