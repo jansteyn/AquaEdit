@@ -101,10 +101,10 @@
           
           <!-- Header -->
           <StackPanel Spacing="8">
-            <TextBlock Text="{Binding SelectedPlugin.Name}"
+            <TextBlock Text="{Binding SelectedPlugin.Name, TargetNullValue=''}"
                        FontSize="24"
                        FontWeight="SemiBold" />
-            <TextBlock Text="{Binding SelectedPlugin.Version}"
+            <TextBlock Text="{Binding SelectedPlugin.Version, TargetNullValue=''}"
                        FontSize="14"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
           </StackPanel>
@@ -113,7 +113,7 @@
           <StackPanel Spacing="4">
             <TextBlock Text="Description"
                        FontWeight="SemiBold" />
-            <TextBlock Text="{Binding SelectedPlugin.Description}"
+            <TextBlock Text="{Binding SelectedPlugin.Description, TargetNullValue=''}"
                        TextWrapping="Wrap" />
           </StackPanel>
 
@@ -124,10 +124,10 @@
             <StackPanel Orientation="Horizontal" Spacing="8">
               <Button Command="{Binding EnablePluginCommand}"
                       Content="Enable"
-                      IsVisible="{Binding !SelectedPlugin.IsEnabled}" />
+                      IsVisible="{Binding SelectedPlugin.IsEnabled, Converter={x:Static BoolConverters.Not}, FallbackValue=False}" />
               <Button Command="{Binding DisablePluginCommand}"
                       Content="Disable"
-                      IsVisible="{Binding SelectedPlugin.IsEnabled}" />
+                      IsVisible="{Binding SelectedPlugin.IsEnabled, FallbackValue=False}" />
               <Button Command="{Binding UninstallPluginCommand}"
                       Content="Uninstall">
                 <Button.Styles>

@@ -9,6 +9,12 @@ using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using AquaEdit.UI.Avalonia.Views.Dialogs;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Platform.Storage;
+using Avalonia;
+using Avalonia.Media;
+using Avalonia.Layout;
+using System.IO;
 
 namespace AquaEdit.UI.Avalonia.ViewModels;
 
@@ -23,6 +29,7 @@ public class MainViewModel : ViewModelBase
     private bool _isSearchVisible;
     private string _title = "AquaEdit";
     private string _statusMessage = "Ready";
+    private bool _isLoading;
 
     public string Title
     {
@@ -63,6 +70,12 @@ public class MainViewModel : ViewModelBase
     {
         get => _isSearchVisible;
         set => this.RaiseAndSetIfChanged(ref _isSearchVisible, value);
+    }
+
+    public bool IsLoading
+    {
+        get => _isLoading;
+        private set => this.RaiseAndSetIfChanged(ref _isLoading, value);
     }
 
     public ObservableCollection<EditorViewModel> OpenDocuments { get; }
@@ -201,6 +214,23 @@ public class MainViewModel : ViewModelBase
             .Subscribe(status => StatusMessage = status ?? "Ready")
             .DisposeWith(Disposables);
 
+        // In the constructor, subscribe to ActiveEditor changes:
+        this.WhenAnyValue(x => x.ActiveEditor)
+            .Subscribe(editor =>
+            {
+                if (editor != null)
+                {
+                    editor.WhenAnyValue(x => x.IsLoading)
+                        .Subscribe(loading => IsLoading = loading)
+                        .DisposeWith(Disposables);
+                }
+                else
+                {
+                    IsLoading = false;
+                }
+            })
+            .DisposeWith(Disposables);
+
         // Load plugins
         LoadPlugins();
     }
@@ -229,9 +259,72 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     private async Task OpenFileAsync()
     {
-        // This would be triggered by the UI layer providing a file path
-        // For demonstration, we'll create a placeholder
-        await Task.CompletedTask;
+        try
+        {
+            // Get the main window from the application
+            var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+            
+            if (mainWindow == null)
+            {
+                StatusMessage = "Unable to open file dialog";
+                return;
+            }
+
+            // Create and configure the OpenFileDialog
+            var dialog = new FilePickerOpenOptions
+            {
+                Title = "Open File",
+                AllowMultiple = false,
+                FileTypeFilter = new[]
+                {
+                    new FilePickerFileType("All Files")
+                    {
+                        Patterns = new[] { "*.*" }
+                    },
+                    new FilePickerFileType("Text Files")
+                    {
+                        Patterns = new[] { "*.txt" }
+                    },
+                    new FilePickerFileType("Log Files")
+                    {
+                        Patterns = new[] { "*.log" }
+                    },
+                    new FilePickerFileType("CSV Files")
+                    {
+                        Patterns = new[] { "*.csv" }
+                    },
+                    new FilePickerFileType("JSON Files")
+                    {
+                        Patterns = new[] { "*.json" }
+                    },
+                    new FilePickerFileType("XML Files")
+                    {
+                        Patterns = new[] { "*.xml" }
+                    },
+                    new FilePickerFileType("Source Code")
+                    {
+                        Patterns = new[] { "*.cs", "*.cpp", "*.h", "*.java", "*.py", "*.js", "*.ts" }
+                    }
+                }
+            };
+
+            // Show the dialog and get the result
+            var result = await mainWindow.StorageProvider.OpenFilePickerAsync(dialog);
+
+            // Check if user selected a file
+            if (result != null && result.Count > 0)
+            {
+                var file = result[0];
+                var filePath = file.Path.LocalPath;
+
+                // Call the existing OpenFileAsync method with the selected file path
+                await OpenFileAsync(filePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Error opening file dialog: {ex.Message}";
+        }
     }
 
     /// <summary>
@@ -239,24 +332,50 @@ public class MainViewModel : ViewModelBase
     /// </summary>
     public async Task OpenFileAsync(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            StatusMessage = "Invalid file path";
+            return;
+        }
+
         try
         {
             // Check if file is already open
             foreach (var doc in OpenDocuments)
             {
-                if (doc.FilePath == filePath)
+                if (string.Equals(doc.FilePath, filePath, StringComparison.OrdinalIgnoreCase))
                 {
                     ActiveEditor = doc;
+                    StatusMessage = $"Switched to {doc.FileName}";
                     return;
                 }
             }
 
+            // Set loading state at MainViewModel level
+            IsLoading = true;
+            StatusMessage = $"Opening {System.IO.Path.GetFileName(filePath)}...";
+
             var editor = new EditorViewModel();
+            
+            // Subscribe to editor's loading progress
+            using var progressSubscription = editor.WhenAnyValue(
+                x => x.IsLoading,
+                x => x.LoadingProgress,
+                x => x.StatusText,
+                (loading, progress, status) => new { loading, progress, status })
+                .Subscribe(state =>
+                {
+                    if (state.loading)
+                    {
+                        StatusMessage = state.status ?? $"Loading... {state.progress}%";
+                    }
+                });
+            
+            // Attempt to open the file
             await editor.OpenFileAsync(filePath);
             
             OpenDocuments.Add(editor);
             ActiveEditor = editor;
-
             AddRecentFile(filePath);
             
             // Notify plugins
@@ -271,9 +390,88 @@ public class MainViewModel : ViewModelBase
 
             StatusMessage = $"Opened {editor.FileName}";
         }
+        catch (FileNotFoundException ex)
+        {
+            StatusMessage = $"File not found: {System.IO.Path.GetFileName(filePath)}";
+            // Optionally show a dialog to the user
+            await ShowErrorDialog("File Not Found", $"The file '{filePath}' could not be found.\n\n{ex.Message}");
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            StatusMessage = $"Access denied: {System.IO.Path.GetFileName(filePath)}";
+            await ShowErrorDialog("Access Denied", $"You do not have permission to open this file.\n\n{ex.Message}");
+        }
+        catch (IOException ex)
+        {
+            StatusMessage = $"I/O error opening file";
+            await ShowErrorDialog("I/O Error", $"An error occurred while reading the file:\n\n{ex.Message}");
+        }
+        catch (OutOfMemoryException ex)
+        {
+            StatusMessage = "File too large";
+            await ShowErrorDialog("Out of Memory", $"The file is too large to open with available memory.\n\n{ex.Message}");
+        }
+        catch (OperationCanceledException)
+        {
+            StatusMessage = "File opening cancelled";
+        }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to open file: {ex.Message}";
+            StatusMessage = $"Error: {ex.Message}";
+            await ShowErrorDialog("Error Opening File", $"An unexpected error occurred:\n\n{ex.Message}\n\nType: {ex.GetType().Name}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    /// <summary>
+    /// Shows an error dialog to the user
+    /// </summary>
+    private async Task ShowErrorDialog(string title, string message)
+    {
+        try
+        {
+            var mainWindow = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)?.MainWindow;
+            
+            if (mainWindow != null)
+            {
+                // You can create a custom error dialog or use a message box
+                var messageBox = new Window
+                {
+                    Title = title,
+                    Width = 450,
+                    Height = 200,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                    Content = new StackPanel
+                    {
+                        Margin = new Thickness(16),
+                        Spacing = 16,
+                        Children =
+                        {
+                            new TextBlock
+                            {
+                                Text = message,
+                                TextWrapping = TextWrapping.Wrap
+                            },
+                            new Button
+                            {
+                                Content = "OK",
+                                HorizontalAlignment = HorizontalAlignment.Center,
+                                MinWidth = 80,
+                                Command = ReactiveCommand.Create(() => { })
+                            }
+                        }
+                    }
+                };
+
+                await messageBox.ShowDialog(mainWindow);
+            }
+        }
+        catch
+        {
+            // Fallback if dialog fails
         }
     }
 

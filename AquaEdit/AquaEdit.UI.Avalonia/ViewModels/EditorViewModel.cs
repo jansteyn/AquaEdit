@@ -2,6 +2,7 @@ using AquaEdit.Core;
 using ReactiveUI;
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -192,13 +193,23 @@ public class EditorViewModel : ViewModelBase, IDisposable
     /// </summary>
     public async Task OpenFileAsync(string filePath)
     {
+        if (string.IsNullOrWhiteSpace(filePath))
+        {
+            StatusText = "Invalid file path";
+            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+        }
+
         try
         {
             IsLoading = true;
             LoadingProgress = 0;
             StatusText = $"Opening {System.IO.Path.GetFileName(filePath)}...";
 
-            var progress = new Progress<int>(value => LoadingProgress = value);
+            var progress = new Progress<int>(value => 
+            {
+                LoadingProgress = value;
+                StatusText = $"Loading... {value}%";
+            });
 
             await _textBuffer.OpenFileAsync(filePath, progress, CancellationToken.None);
 
@@ -208,12 +219,40 @@ public class EditorViewModel : ViewModelBase, IDisposable
             IsDirty = false;
 
             LoadVisibleLines();
-            StatusText = $"Opened {FileName} ({LineCount:N0} lines)";
+            
+            var fileSize = new System.IO.FileInfo(filePath).Length;
+            var fileSizeStr = FormatFileSize(fileSize);
+            StatusText = $"Opened {FileName} ({LineCount:N0} lines, {fileSizeStr})";
+        }
+        catch (FileNotFoundException ex)
+        {
+            StatusText = $"File not found: {System.IO.Path.GetFileName(filePath)}";
+            throw new FileNotFoundException($"The file could not be found: {filePath}", ex);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            StatusText = $"Access denied: {System.IO.Path.GetFileName(filePath)}";
+            throw new UnauthorizedAccessException($"You do not have permission to access this file: {filePath}", ex);
+        }
+        catch (IOException ex)
+        {
+            StatusText = $"I/O error: {ex.Message}";
+            throw new IOException($"An I/O error occurred while opening the file: {filePath}", ex);
+        }
+        catch (OutOfMemoryException ex)
+        {
+            StatusText = "File too large - out of memory";
+            throw new OutOfMemoryException($"Insufficient memory to open file: {filePath}", ex);
+        }
+        catch (OperationCanceledException)
+        {
+            StatusText = "File opening cancelled";
+            throw;
         }
         catch (Exception ex)
         {
-            StatusText = $"Failed to open file: {ex.Message}";
-            throw;
+            StatusText = $"Error: {ex.Message}";
+            throw new ApplicationException($"An unexpected error occurred while opening the file: {filePath}", ex);
         }
         finally
         {
@@ -328,5 +367,21 @@ public class EditorViewModel : ViewModelBase, IDisposable
         _textBuffer.Dispose();
         Disposables.Dispose();
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Formats file size for display
+    /// </summary>
+    private static string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
     }
 }

@@ -47,7 +47,11 @@ public class StatusBarViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _message, value);
     }
 
-    public StatusBarViewModel(EditorViewModel? editorViewModel = null)
+    public StatusBarViewModel() : this(null)
+    {
+    }
+
+    public StatusBarViewModel(EditorViewModel? editorViewModel)
     {
         _editorViewModel = editorViewModel;
 

@@ -29,8 +29,44 @@ public class TextBuffer : IDisposable
     /// </summary>
     public async Task OpenFileAsync(string filePath, IProgress<int>? progress = null, CancellationToken cancellationToken = default)
     {
-        _fileManager.OpenFile(filePath, FileMode.Open, FileAccess.Read);
-        await _lineIndexer.BuildIndexAsync(progress, cancellationToken);
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
+
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException($"File not found: {filePath}", filePath);
+
+        try
+        {
+            // Close any previously opened file
+            _fileManager.Close();
+            _editOverlay.Clear();
+
+            // Open the new file
+            _fileManager.OpenFile(filePath, FileMode.Open, FileAccess.Read);
+            
+            // Build the line index
+            await _lineIndexer.BuildIndexAsync(progress, cancellationToken);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            throw new UnauthorizedAccessException($"Access denied to file: {filePath}", ex);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException($"I/O error while opening file: {filePath}", ex);
+        }
+        catch (OperationCanceledException)
+        {
+            // Clean up on cancellation
+            _fileManager.Close();
+            throw;
+        }
+        catch (Exception ex)
+        {
+            // Clean up on any error
+            _fileManager.Close();
+            throw new IOException($"Failed to open file: {filePath}", ex);
+        }
     }
 
     /// <summary>

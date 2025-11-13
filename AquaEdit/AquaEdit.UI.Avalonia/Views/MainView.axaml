@@ -69,7 +69,7 @@
     <!-- Editor View -->
     <Grid>
       <!-- Welcome Screen (when no file is open) -->
-      <Border IsVisible="{Binding !ActiveEditor}"
+      <Border IsVisible="{Binding ActiveEditor, Converter={x:Static ObjectConverters.IsNull}}"
               Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
         <StackPanel VerticalAlignment="Center" 
                     HorizontalAlignment="Center"

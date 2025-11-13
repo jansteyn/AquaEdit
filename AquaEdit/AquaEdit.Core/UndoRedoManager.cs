@@ -1,20 +1,34 @@
+using ReactiveUI;
+
 namespace AquaEdit.Core;
 
 /// <summary>
 /// Manages undo/redo operations using a command pattern
 /// </summary>
-public class UndoRedoManager
+public class UndoRedoManager : ReactiveObject
 {
     private readonly Stack<Patch> _undoStack = new();
     private readonly Stack<Patch> _redoStack = new();
     private readonly TextBuffer _textBuffer;
+    private bool _canUndo;
+    private bool _canRedo;
 
-    public bool CanUndo => _undoStack.Count > 0;
-    public bool CanRedo => _redoStack.Count > 0;
+    public bool CanUndo
+    {
+        get => _canUndo;
+        private set => this.RaiseAndSetIfChanged(ref _canUndo, value);
+    }
+
+    public bool CanRedo
+    {
+        get => _canRedo;
+        private set => this.RaiseAndSetIfChanged(ref _canRedo, value);
+    }
 
     public UndoRedoManager(TextBuffer textBuffer)
     {
         _textBuffer = textBuffer;
+        UpdateCanExecute();
     }
 
     /// <summary>
@@ -24,6 +38,7 @@ public class UndoRedoManager
     {
         _undoStack.Push(patch);
         _redoStack.Clear(); // Clear redo stack when new action is performed
+        UpdateCanExecute();
     }
 
     /// <summary>
@@ -41,6 +56,7 @@ public class UndoRedoManager
         var inversePatch = CreateInversePatch(patch);
         _textBuffer.ApplyEdit(inversePatch);
 
+        UpdateCanExecute();
         return patch;
     }
 
@@ -56,6 +72,7 @@ public class UndoRedoManager
         _undoStack.Push(patch);
         _textBuffer.ApplyEdit(patch);
 
+        UpdateCanExecute();
         return patch;
     }
 
@@ -80,5 +97,12 @@ public class UndoRedoManager
     {
         _undoStack.Clear();
         _redoStack.Clear();
+        UpdateCanExecute();
+    }
+
+    private void UpdateCanExecute()
+    {
+        CanUndo = _undoStack.Count > 0;
+        CanRedo = _redoStack.Count > 0;
     }
 }

@@ -72,8 +72,31 @@ public class FileManager : IDisposable
     /// </summary>
     public byte[] ReadBytes(long offset, int count)
     {
-        var window = GetWindow(offset, count);
-        return window.ReadRange(offset - window.Offset, count);
+        if (_mmf == null || !IsOpen)
+            throw new InvalidOperationException("No file is currently open.");
+
+        if (offset < 0 || offset >= _fileSize)
+            throw new ArgumentOutOfRangeException(nameof(offset), "Offset is outside file bounds.");
+
+        if (count <= 0)
+            return Array.Empty<byte>();
+
+        // Ensure we don't read beyond file size
+        // TODO: Culprit
+        var actualCount = (int)Math.Min(count, _fileSize - offset);
+        
+        if (actualCount <= 0)
+            return Array.Empty<byte>();
+
+        try
+        {
+            var window = GetWindow(offset, actualCount);
+            return window.ReadRange(offset - window.Offset, actualCount);
+        }
+        catch (Exception ex)
+        {
+            throw new IOException($"Failed to read bytes at offset {offset} with count {count}", ex);
+        }
     }
 
     /// <summary>
